@@ -4,7 +4,7 @@ const argv = require("yargs")
 	.demandCommand(1)
 	.default("min", 320)
 	.default("max", 1280)
-	.default("by", 20)
+	.default("by", 80)
 	.default("dpr", "1,2,3")
 	.default("csv", false).argv;
 
