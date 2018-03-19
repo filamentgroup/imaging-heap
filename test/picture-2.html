@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title></title>
+		<style>
+			img {
+				width: 200px;
+			}
+			@media (min-width: 21.25em) {
+				img {
+					width: 300px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<picture>
+			<source type="image/jpg" srcset="images/fam-320.jpg 320w, images/fam-480.jpg 480w, images/fam-960.jpg 960w">
+			<img src="images/fam-320.jpg">
+		</picture>
+		<picture>
+			<source type="image/jpg" srcset="images/sunset-320.jpg 320w, images/sunset-640.jpg 640w, images/sunset-1280.jpg 1280w">
+			<img src="images/sunset-320.jpg">
+		</picture>
+	</body>
+</html>

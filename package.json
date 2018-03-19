@@ -1,0 +1,47 @@
+{
+  "name": "image-report",
+  "version": "1.0.0",
+  "description": "A command line tool to measure responsive image efficiency across viewport sizes and device pixel ratios.",
+  "main": "src/ImageReport.js",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "bin": {
+    "imagereport": "./src/cmd.js"
+  },
+  "keywords": [
+    "responsive-images",
+    "img"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/filamentgroup/image-report.git"
+  },
+  "author": {
+    "name": "Zach Leatherman",
+    "email": "zach@filamentgroup.com",
+    "url": "https://filamentgroup.com/"
+  },
+  "license": "MIT",
+  "ava": {
+    "files": [
+      "test/*.js"
+    ],
+    "source": [
+      "src/**/*.js"
+    ]
+  },
+  "devDependencies": {
+    "ava": "^0.25.0"
+  },
+  "dependencies": {
+    "chalk": "^2.3.2",
+    "debug": "^3.1.0",
+    "puppeteer": "^1.1.1",
+    "table": "^4.0.3",
+    "yargs": "^11.0.0"
+  }
+}
