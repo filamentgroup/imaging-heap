@@ -26,6 +26,10 @@ class ImageMap {
 		return this.map;
 	}
 
+	getNumberOfImages() {
+		return Object.keys(this.map).length;
+	}
+
 	truncateUrl(url) {
 		// let urlMaxLength = 20;
 		// return (url.length > urlMaxLength ? "…" : "") + url.substr(-1 * urlMaxLength);
@@ -60,9 +64,9 @@ class ImageMap {
 					let efficiencyOutput;
 					if( dprNum === 1 && compare < 0 ) {
 						efficiencyOutput = chalk.red(`${efficiencyValue}x`);
-					} else if( compare < -.21 ) {
+					} else if( compare < -.25 ) {
 						efficiencyOutput = chalk.yellow(`${efficiencyValue}x`);
-					} else if( compare >= -.21 && compare <= .21 ) { // relies on < 0 && dpr === 1 above
+					} else if( compare >= -.25 && compare <= .25 ) { // relies on < 0 && dpr === 1 above
 						efficiencyOutput = chalk.green(`${efficiencyValue}x`);
 					} else {
 						efficiencyOutput = `${efficiencyValue}x`;

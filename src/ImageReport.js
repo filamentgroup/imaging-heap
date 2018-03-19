@@ -107,7 +107,18 @@ class ImageReport {
 			let imgIndexCounter = 0;
 
 			return Promise.all(
-				imgArray.map(function(img) {
+				imgArray.filter(function(img) {
+					let src = img.currentSrc;
+					if( !src ) {
+						return true;
+					}
+					let split = (new URL(src)).pathname.split(".");
+					if( !split.length ) {
+						return true;
+					}
+
+					return split.pop().toLowerCase() !== "svg";
+				}).map(function(img) {
 					let key = "data-image-report-index";
 					let id = img.getAttribute(key);
 					if(!id) {
@@ -162,6 +173,9 @@ class ImageReport {
 		for( let url in this.map ) {
 			let str = this.map[url].getOutput();
 			output.push(str);
+
+			let size = this.map[url].getNumberOfImages();
+			output.push(size + " bitmap image" + (size !== 1 ? "s" : "") + " found.");
 		}
 		return output.join( "\n" );
 	}
