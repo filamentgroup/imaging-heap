@@ -122,7 +122,7 @@ class ImageReport {
 					let key = "data-image-report-index";
 					let id = img.getAttribute(key);
 					if(!id) {
-						id = "img-" + (imgIndexCounter++);
+						id = img.getAttribute("src");
 						console.log("Creating new img id", id);
 						img.setAttribute(key, id);
 					} else {

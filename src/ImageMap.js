@@ -7,16 +7,16 @@ class ImageMap {
 		this.map = {};
 	}
 
-	addImage(id, dpr, stats) {
-		if( !this.map[id] ) {
-			this.map[id] = {};
+	addImage(identifier, dpr, stats) {
+		if( !this.map[identifier] ) {
+			this.map[identifier] = {};
 		}
 
-		let img = this.map[id][dpr];
+		let img = this.map[identifier][dpr];
 
 		if(!img) {
 			img = new Image();
-			this.map[id][dpr] = img;
+			this.map[identifier][dpr] = img;
 		}
 
 		img.addStatsObject(stats);
@@ -38,12 +38,13 @@ class ImageMap {
 
 	_getOutputObj() {
 		let output = {};
-		for( let id in this.map ) {
-			let map = this.map[id];
+		for( let identifier in this.map ) {
+			let map = this.map[identifier];
 			let tableHeaders = ["Viewport", "Width in"];
 			let tableHeadersRow2 = ["", "Layout"];
 			let tableRows = {};
 			let htmlOutput = "";
+			let hasWidthInLayout = false;
 
 			for( let dpr in map ) {
 				tableHeaders.push(`Match`);
@@ -74,6 +75,9 @@ class ImageMap {
 
 					let vw = `${vwStats.viewportWidth}px`;
 					if(!tableRows[vw]) {
+						if(vwStats.width) {
+							hasWidthInLayout = true;
+						}
 						tableRows[vw] = [`${vwStats.width}px`];
 					}
 					tableRows[vw].push(efficiencyOutput);
@@ -82,12 +86,14 @@ class ImageMap {
 				}
 			}
 
-			let tableContent = [tableHeaders, tableHeadersRow2];
-			for(let row in tableRows) {
-				tableContent.push([].concat(row, tableRows[row]));
-			}
+			if( hasWidthInLayout ) {
+				let tableContent = [tableHeaders, tableHeadersRow2];
+				for(let row in tableRows) {
+					tableContent.push([].concat(row, tableRows[row]));
+				}
 
-			output[htmlOutput] = tableContent;
+				output[htmlOutput] = tableContent;
+			}
 		}
 
 		return output;
