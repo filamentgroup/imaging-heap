@@ -181,12 +181,10 @@ class ImageReport {
 	getResults() {
 		let output = [];
 		for( let url in this.map ) {
-			let str = this.map[url].getOutput();
+			let str = this.map[url].getOutput(this.options.useCsv);
 			output.push(str);
-
-			let size = this.map[url].getNumberOfImages();
-			output.push(size + " bitmap image" + (size !== 1 ? "s" : "") + " found.");
 		}
+
 		return output.join( "\n" );
 	}
 

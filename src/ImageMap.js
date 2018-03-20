@@ -40,41 +40,77 @@ class ImageMap {
 		return url.split("/").pop();
 	}
 
-	_getOutputObj() {
+	_getTableHeadersForIdentifier(identifier, showCurrentSrc) {
+		let tableHeaders = [
+			["", "Image"],
+			["", "Width in"],
+			["Viewport", "Layout"]
+		];
+		let map = this.map[identifier];
+
+		for( let dpr in map ) {
+			tableHeaders[0].push(`@${dpr}x`);
+			tableHeaders[1].push(`File`);
+			tableHeaders[2].push(`Width`);
+			tableHeaders[0].push(`@${dpr}x`);
+			tableHeaders[1].push(`Ratio`);
+			tableHeaders[2].push(``);
+
+			if(showCurrentSrc) {
+				tableHeaders[0].push(``);
+				tableHeaders[1].push(`@${dpr}x`);
+				tableHeaders[2].push(`currentSrc`);
+			}
+		}
+
+		return tableHeaders;
+	}
+
+	_convertTableHeadersToString(headers) {
+		let ret = [];
+		let firstRow = true;
+		for( let row of headers ) {
+			for( let colKey = 0, k = row.length; colKey < k; colKey++ ) {
+				if( firstRow ) {
+					ret.push([]);
+				}
+
+				if( row[colKey] ) {
+					ret[colKey].push(row[colKey]);
+				}
+			}
+
+			firstRow = false;
+		}
+		return ret.map(header => header.join(" "));
+	}
+
+	_getOutputObj(showCurrentSrc) {
 		let output = {};
 		for( let identifier in this.map ) {
 			let map = this.map[identifier];
-			let tableHeaders = ["Viewport", "Width in"];
-			let tableHeadersRow2 = ["", "Layout"];
+			
 			let tableRows = {};
 			let htmlOutput = "";
 			let includeInOutput = false;
 
 			for( let dpr in map ) {
-				tableHeaders.push(`Match`);
-				tableHeadersRow2.push(`to ${dpr}x`);
-				// tableHeaders.push("currentSrc");
-				tableHeaders.push(`File`);
-				tableHeadersRow2.push(`Width`);
-
 				let stats = map[dpr].getStats();
 				for( let vwStats of stats ) {
 					if( !htmlOutput ) {
 						htmlOutput = `${vwStats.html}`;
 					}
 					let dprNum = parseInt(dpr);
-					let efficiencyValue = vwStats.efficiency.toFixed(2);
+					let widthRatio = vwStats.efficiency.toFixed(2);
 
-					let compare = efficiencyValue - dprNum;
+					let compare = widthRatio - dprNum;
 					let efficiencyOutput;
-					if( dprNum === 1 && compare < 0 ) {
-						efficiencyOutput = chalk.red(`${efficiencyValue}x`);
+					if( widthRatio < 1 || compare < -.4 ) {
+						efficiencyOutput = chalk.red(`${widthRatio}x`);
 					} else if( compare < -.25 ) {
-						efficiencyOutput = chalk.yellow(`${efficiencyValue}x`);
-					} else if( compare >= -.25 && compare <= .25 ) { // relies on < 0 && dpr === 1 above
-						efficiencyOutput = chalk.green(`${efficiencyValue}x`);
+						efficiencyOutput = chalk.yellow(`${widthRatio}x`);
 					} else {
-						efficiencyOutput = `${efficiencyValue}x`;
+						efficiencyOutput = `${widthRatio}x`;
 					}
 
 					let vw = `${vwStats.viewportWidth}px`;
@@ -84,19 +120,25 @@ class ImageMap {
 						}
 						tableRows[vw] = [`${vwStats.width}px`];
 					}
-					tableRows[vw].push(efficiencyOutput);
-					// tableRows[vw].push(this.truncateUrl(vwStats.src));
 					tableRows[vw].push(`${vwStats.fileWidth}px`);
+					tableRows[vw].push(efficiencyOutput);
+
+					if( showCurrentSrc ) {
+						tableRows[vw].push(vwStats.src);
+					}
 				}
 			}
 
 			if( includeInOutput ) {
-				let tableContent = [tableHeaders, tableHeadersRow2];
+				let tableContent = [];
 				for(let row in tableRows) {
 					tableContent.push([].concat(row, tableRows[row]));
 				}
 
-				output[htmlOutput] = tableContent;
+				output[htmlOutput] = {
+					headers: this._getTableHeadersForIdentifier(identifier, showCurrentSrc),
+					content: tableContent
+				};
 			}
 		}
 
@@ -105,37 +147,53 @@ class ImageMap {
 
 	getCsvOutput() {
 		let DELIMITER = ",";
-		let obj = this._getOutputObj();
+		let obj = this._getOutputObj(true);
 		let output = [];
 		for( let html in obj ) {
-			output.push(html);
-			for( let row of obj[html]) {
+			output.push(this._convertTableHeadersToString(obj[html].headers));
+			for( let row of obj[html].content) {
 				output.push(row.join(DELIMITER));
 			}
-			output.push("");
+			output.push("# ---"); // DELIMIT CSV FILES
 		}
 
 		return output.join("\n");
 	}
 
-	getOutput() {
+	_getOutput() {
 		let obj = this._getOutputObj();
 		let output = [];
 
 		for( let html in obj ) {
 			output.push(html);
-			output.push(table(obj[html], {
+
+			let rows = [].concat(obj[html].headers, obj[html].content);
+			output.push(table(rows, {
 				drawHorizontalLine: (index, size) => {
-					return index === 0 || index === 2 || index === size;
+					return index === 0 || index === 3 || index === size;
 				}
-			}));
+			}) +
+			chalk.underline("Legend") +
+			": " + 
+			chalk.red("Too blurry—need a bigger image!") +
+			" " +
+			chalk.yellow("Close but room for improvement!") + "\n");
 		}
 
-		// output.push();
-		// output.push("Match > 1 means the image is too big (wasted detail).");
-		// output.push("Match < 1 means the image is too small (blurry render).");
+		let size = this.getNumberOfImages();
+		output.push(size + " bitmap image" + (size !== 1 ? "s" : "") + " found.");
 
 		return output.join("\n");
+	}
+
+	getOutput(useCsv) {
+		if(useCsv) {
+			chalk.enabled = false;
+
+			return this.getCsvOutput();
+		}
+
+		return this._getOutput();
 	}
 }
 
