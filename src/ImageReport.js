@@ -6,6 +6,8 @@ class ImageReport {
 	constructor(options) {
 		this.options = Object.assign({}, this.defaultOptions, options || {});
 
+		this.dprArray = (this.options.dpr || "").split(",").map(dpr => parseInt(dpr, 10));
+
 		debug("Options: %o", this.options);
 
 		this.map = {};
@@ -17,9 +19,13 @@ class ImageReport {
 			maxViewportWidth: 1280,
 			increment: 80,
 			useCsv: false,
-			dpr: [1,2,3],
+			dpr: "1,2,3",
 			minImageWidth: 5
 		};
+	}
+
+	getDprArraySize() {
+		return this.dprArray.length;
 	}
 
 	async start() {
@@ -52,8 +58,10 @@ class ImageReport {
 
 	async iterate(url, callback) {
 		this.map[url] = new ImageMap();
-		for( let j = 0, k = this.options.dpr.length; j < k; j++ ) {
-			let dpr = this.options.dpr[j];
+		this.map[url].setMinimumImageWidth(this.options.minImageWidth);
+
+		for( let j = 0, k = this.dprArray.length; j < k; j++ ) {
+			let dpr = this.dprArray[j];
 			await this.iterateViewports(url, dpr, callback);
 		}
 	}
@@ -107,7 +115,6 @@ class ImageReport {
 
 			let imgNodes = document.querySelectorAll("img");
 			let imgArray = Array.from(imgNodes);
-			let imgIndexCounter = 0;
 
 			return Promise.all(
 				imgArray.filter(function(img) {

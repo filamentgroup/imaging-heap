@@ -39,14 +39,12 @@ const ProgressBar = require("progress");
 
 (async function() {
 	try {
-		let dprs = (argv.dpr || "").split(",").map(dpr => parseInt(dpr, 10));
-
 		let report = new ImageReport({
 			minViewportWidth: argv.min,
 			maxViewportWidth: argv.max,
 			increment: argv.by,
 			useCsv: argv.csv,
-			dpr: dprs,
+			dpr: argv.dpr,
 			minImageWidth: argv.minimagewidth
 		});
 
@@ -59,7 +57,7 @@ const ProgressBar = require("progress");
 					await report.finish();
 					console.log(report.getResults());
 				},
-				total: ((argv.max - argv.min) / argv.by + 1) * dprs.length
+				total: ((argv.max - argv.min) / argv.by + 1) * report.getDprArraySize()
 			});
 		}
 

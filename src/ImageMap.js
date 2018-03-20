@@ -7,6 +7,10 @@ class ImageMap {
 		this.map = {};
 	}
 
+	setMinimumImageWidth(width) {
+		this.minImageWidth = width;
+	}
+
 	addImage(identifier, dpr, stats) {
 		if( !this.map[identifier] ) {
 			this.map[identifier] = {};
@@ -44,7 +48,7 @@ class ImageMap {
 			let tableHeadersRow2 = ["", "Layout"];
 			let tableRows = {};
 			let htmlOutput = "";
-			let hasWidthInLayout = false;
+			let includeInOutput = false;
 
 			for( let dpr in map ) {
 				tableHeaders.push(`Match`);
@@ -75,8 +79,8 @@ class ImageMap {
 
 					let vw = `${vwStats.viewportWidth}px`;
 					if(!tableRows[vw]) {
-						if(vwStats.width) {
-							hasWidthInLayout = true;
+						if(vwStats.width && (!this.minImageWidth || vwStats.width > this.minImageWidth)) {
+							includeInOutput = true;
 						}
 						tableRows[vw] = [`${vwStats.width}px`];
 					}
@@ -86,7 +90,7 @@ class ImageMap {
 				}
 			}
 
-			if( hasWidthInLayout ) {
+			if( includeInOutput ) {
 				let tableContent = [tableHeaders, tableHeadersRow2];
 				for(let row in tableRows) {
 					tableContent.push([].concat(row, tableRows[row]));
