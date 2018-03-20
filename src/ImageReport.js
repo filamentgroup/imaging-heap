@@ -81,7 +81,8 @@ class ImageReport {
 			// 	waitUntil: ["load", "networkidle0"]
 			// });
 
-			for( let stats of await this.getImagesStats(page) ) {
+			let imagesStats = await this.getImagesStats(page);
+			for( let stats of imagesStats ) {
 				this.map[url].addImage(stats.id, dpr, stats);
 			}
 
@@ -90,24 +91,29 @@ class ImageReport {
 	}
 
 	async getImagesStats(page) {
-		return await page.evaluate(function() {
+		return page.evaluate(async function() {
 			function findNaturalWidth(src, stats, resolve, reject) {
-				var naturalImg = document.createElement("img");
-				naturalImg.src = src;
-				naturalImg.onload = function() {
-					resolve(Object.assign(stats, {
-						fileWidth: naturalImg.naturalWidth,
-						src: src,
-					}));
+				try {
+					var naturalImg = document.createElement("img");
+					naturalImg.src = src;
+					naturalImg.onload = function() {
+						resolve(Object.assign(stats, {
+							fileWidth: naturalImg.naturalWidth,
+							src: src,
+						}));
 
-					this.parentNode.removeChild(this);
-				};
+						this.parentNode.removeChild(this);
+						console.log( "removed node for", src );
+					};
 
-				naturalImg.onerror = function() {
-					reject(`Could not load ${src}`);
-				};
+					naturalImg.onerror = function() {
+						reject(`Could not load ${src}`);
+					};
 
-				document.body.appendChild(naturalImg);
+					document.body.appendChild(naturalImg);
+				} catch(e) {
+					reject(`Could not create dimensions image for ${src}`);
+				}
 			}
 
 			let viewportWidth = document.documentElement.clientWidth;
@@ -116,7 +122,7 @@ class ImageReport {
 			let imgNodes = document.querySelectorAll("img");
 			let imgArray = Array.from(imgNodes);
 
-			return Promise.all(
+			return await Promise.all(
 				imgArray.filter(function(img) {
 					let src = img.currentSrc;
 					if( !src ) {
@@ -158,19 +164,16 @@ class ImageReport {
 					};
 
 					return new Promise(function(resolve, reject) {
-						try {
-							if( !img.currentSrc ) {
-								img.onload = function() {
-									img.onload = null;
+						if( !img.currentSrc ) {
+							console.log( "No img.currentSrc, waiting to load image to find dimensions." );
+							img.onload = function() {
+								img.onload = null;
 
-									findNaturalWidth(img.currentSrc, stats, resolve, reject);
-								};
-							} else {
 								findNaturalWidth(img.currentSrc, stats, resolve, reject);
-							}
-
-						} catch(e) {
-							console.log("Error: ", e);
+							};
+						} else {
+							console.log( "currentSrc exists, finding dimensions." );
+							findNaturalWidth(img.currentSrc, stats, resolve, reject);
 						}
 					});
 				})

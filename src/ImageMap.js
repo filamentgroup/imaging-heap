@@ -5,10 +5,20 @@ const chalk = require("chalk");
 class ImageMap {
 	constructor() {
 		this.map = {};
+		this.showCurrentSrc = false;
+		this.showPercentages = true;
 	}
 
 	setMinimumImageWidth(width) {
 		this.minImageWidth = width;
+	}
+
+	setShowCurrentSrc(showCurrentSrc) {
+		this.showCurrentSrc = !!showCurrentSrc;
+	}
+
+	setShowPercentages(showPercentages) {
+		this.showPercentages = !!showPercentages;
 	}
 
 	addImage(identifier, dpr, stats) {
@@ -40,7 +50,7 @@ class ImageMap {
 		return url.split("/").pop();
 	}
 
-	_getTableHeadersForIdentifier(identifier, showCurrentSrc) {
+	_getTableHeadersForIdentifier(identifier) {
 		let tableHeaders = [
 			["", "Image"],
 			["", "Width in"],
@@ -50,13 +60,18 @@ class ImageMap {
 
 		for( let dpr in map ) {
 			tableHeaders[0].push(`@${dpr}x`);
-			tableHeaders[1].push(`File`);
+			tableHeaders[1].push(`Image`);
 			tableHeaders[2].push(`Width`);
 			tableHeaders[0].push(`@${dpr}x`);
-			tableHeaders[1].push(`Ratio`);
-			tableHeaders[2].push(``);
+			if( this.showPercentages ) {
+				tableHeaders[1].push(`Percentage`);
+				tableHeaders[2].push(`Match`);
+			} else {
+				tableHeaders[1].push(`Ratio`);
+				tableHeaders[2].push(``);
+			}
 
-			if(showCurrentSrc) {
+			if(this.showCurrentSrc) {
 				tableHeaders[0].push(``);
 				tableHeaders[1].push(`@${dpr}x`);
 				tableHeaders[2].push(`currentSrc`);
@@ -85,7 +100,7 @@ class ImageMap {
 		return ret.map(header => header.join(" "));
 	}
 
-	_getOutputObj(showCurrentSrc) {
+	_getOutputObj() {
 		let output = {};
 		for( let identifier in this.map ) {
 			let map = this.map[identifier];
@@ -101,16 +116,22 @@ class ImageMap {
 						htmlOutput = `${vwStats.html}`;
 					}
 					let dprNum = parseInt(dpr);
-					let widthRatio = vwStats.efficiency.toFixed(2);
+					let widthRatio = vwStats.efficiency;
 
-					let compare = widthRatio - dprNum;
+					let percentage = (widthRatio * 100 / dprNum).toFixed(1);
+					let str = `${widthRatio.toFixed(2)}x`;
+
+					if( this.showPercentages ) {
+						str = `${percentage}%`;
+					}
+
 					let efficiencyOutput;
-					if( widthRatio < 1 || compare < -.4 ) {
-						efficiencyOutput = chalk.red(`${widthRatio}x`);
-					} else if( compare < -.25 ) {
-						efficiencyOutput = chalk.yellow(`${widthRatio}x`);
+					if( widthRatio < 1 || percentage < 85 ) {
+						efficiencyOutput = chalk.red(str);
+					} else if( percentage < 92 ) {
+						efficiencyOutput = chalk.yellow(str);
 					} else {
-						efficiencyOutput = `${widthRatio}x`;
+						efficiencyOutput = str;
 					}
 
 					let vw = `${vwStats.viewportWidth}px`;
@@ -123,7 +144,7 @@ class ImageMap {
 					tableRows[vw].push(`${vwStats.fileWidth}px`);
 					tableRows[vw].push(efficiencyOutput);
 
-					if( showCurrentSrc ) {
+					if( this.showCurrentSrc ) {
 						tableRows[vw].push(vwStats.src);
 					}
 				}
@@ -136,7 +157,7 @@ class ImageMap {
 				}
 
 				output[htmlOutput] = {
-					headers: this._getTableHeadersForIdentifier(identifier, showCurrentSrc),
+					headers: this._getTableHeadersForIdentifier(identifier, this.showCurrentSrc),
 					content: tableContent
 				};
 			}
@@ -146,8 +167,10 @@ class ImageMap {
 	}
 
 	getCsvOutput() {
+		this.setShowCurrentSrc(true);
+
 		let DELIMITER = ",";
-		let obj = this._getOutputObj(true);
+		let obj = this._getOutputObj();
 		let output = [];
 		for( let html in obj ) {
 			output.push(this._convertTableHeadersToString(obj[html].headers));

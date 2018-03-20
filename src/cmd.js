@@ -20,7 +20,8 @@ const argv = require("yargs")
 		},
 		dpr: {
 			describe: "List of Device Pixel Ratios",
-			default: defaults.dpr
+			default: defaults.dpr,
+			type: "string"
 		},
 		minimagewidth: { // tracking pixels
 			describe: "Ignore images smaller than image width",
@@ -29,7 +30,7 @@ const argv = require("yargs")
 		csv: {
 			describe: "Output CSV",
 			default: defaults.useCsv,
-			boolean: true
+			type: "boolean"
 		}
 	})
 	.help()
