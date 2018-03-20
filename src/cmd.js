@@ -1,15 +1,41 @@
 #!/usr/bin/env node
+const ImageReport = require("./ImageReport");
+let defaults = ImageReport.defaultOptions;
+
 const argv = require("yargs")
 	.usage("imagereport http://example.com/ [options]")
 	.demandCommand(1)
-	.default("min", 320)
-	.default("max", 1280)
-	.default("by", 80)
-	.default("dpr", "1,2,3")
-	.default("csv", false).argv;
+	.options({
+		min: {
+			describe: "Minimum viewport width",
+			default: defaults.minViewportWidth
+		},
+		max: {
+			describe: "Maximum viewport width",
+			default: defaults.maxViewportWidth
+		},
+		by: {
+			describe: "Increment viewport by",
+			default: defaults.increment
+		},
+		dpr: {
+			describe: "List of Device Pixel Ratios",
+			default: defaults.dpr
+		},
+		minimagewidth: { // tracking pixels
+			describe: "Ignore images smaller than image width",
+			default: defaults.minImageWidth
+		},
+		csv: {
+			describe: "Output CSV",
+			default: defaults.useCsv,
+			boolean: true
+		}
+	})
+	.help()
+	.argv;
 
 const ProgressBar = require("progress");
-const ImageReport = require("./ImageReport");
 
 (async function() {
 	try {
@@ -20,31 +46,32 @@ const ImageReport = require("./ImageReport");
 			maxViewportWidth: argv.max,
 			increment: argv.by,
 			useCsv: argv.csv,
-			dpr: dprs
+			dpr: dprs,
+			minImageWidth: argv.minimagewidth
 		});
 
 		let bar;
-		if( !process.env.DEBUG ) {
-			bar = new ProgressBar(':bar :current/:total', {
+		if (!process.env.DEBUG) {
+			bar = new ProgressBar(":bar :current/:total", {
 				incomplete: ".",
 				clear: true,
 				callback: async function() {
 					await report.finish();
 					console.log(report.getResults());
 				},
-				total: ( (argv.max - argv.min) / argv.by + 1 ) * dprs.length
+				total: ((argv.max - argv.min) / argv.by + 1) * dprs.length
 			});
 		}
 
 		await report.start();
 
 		await report.iterate(argv._.pop(), function() {
-			if( bar ) {
+			if (bar) {
 				bar.tick();
 			}
 		});
 
-		if(!bar) {
+		if (!bar) {
 			await report.finish();
 			console.log(report.getResults());
 		}

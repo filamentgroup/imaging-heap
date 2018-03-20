@@ -4,19 +4,22 @@ const debug = require("debug")("imagereport");
 
 class ImageReport {
 	constructor(options) {
-		this.defaultOptions = {
-			minViewportWidth: 320,
-			maxViewportWidth: 1200,
-			increment: 160,
-			useCsv: false,
-			dpr: [1,2,3]
-		};
-
 		this.options = Object.assign({}, this.defaultOptions, options || {});
 
 		debug("Options: %o", this.options);
 
 		this.map = {};
+	}
+
+	static get defaultOptions() {
+		return {
+			minViewportWidth: 320,
+			maxViewportWidth: 1280,
+			increment: 80,
+			useCsv: false,
+			dpr: [1,2,3],
+			minImageWidth: 5
+		};
 	}
 
 	async start() {
