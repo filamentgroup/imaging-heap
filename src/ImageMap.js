@@ -128,7 +128,7 @@ class ImageMap {
 					let efficiencyOutput;
 					if( widthRatio < 1 || percentage < 85 ) {
 						efficiencyOutput = chalk.red(str);
-					} else if( percentage < 92 ) {
+					} else if( percentage < 92 || percentage > 150 ) {
 						efficiencyOutput = chalk.yellow(str);
 					} else {
 						efficiencyOutput = str;
