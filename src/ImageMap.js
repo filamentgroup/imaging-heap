@@ -196,7 +196,7 @@ class ImageMap {
 					return index === 0 || index === 3 || index === size;
 				}
 			}) +
-			`${chalk.underline("Legend")}:  @1x ${chalk.red("<100%")} ${chalk.yellow(">150%")}    Above @1x ${chalk.red("<75%")} ${chalk.yellow("75%–92%")}\n`);
+			`${chalk.underline("Legend")}:  @1x ${chalk.red("<100%")} ${chalk.yellow(">150%")}    Above @1x ${chalk.red("<75%")} ${chalk.yellow("75%–92%, >150%")}\n`);
 		}
 
 		let size = this.getNumberOfImages();
