@@ -2,6 +2,8 @@
 
 There’s beauty in the breakdown of bitmap image data. A command line tool to measure the efficiency of your responsive image markup across viewport sizes and device pixel ratios.
 
+Works out-of-the-box with `img`, `img[srcset]`, `picture`, `picture [srcset]`. Ignores `.svg` files. No support for background images (yet?).
+
 ## Installation
 
 ```sh
