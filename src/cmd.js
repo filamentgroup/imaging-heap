@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-const ImageReport = require("./ImageReport");
-let defaults = ImageReport.defaultOptions;
+const ImagingHeap = require("./ImagingHeap");
+let defaults = ImagingHeap.defaultOptions;
 
 const argv = require("yargs")
-	.usage("imagereport http://example.com/ [options]")
+	.usage("imagingheap http://example.com/ [options]")
 	.demandCommand(1)
 	.options({
 		min: {
@@ -40,7 +40,7 @@ const ProgressBar = require("progress");
 
 (async function() {
 	try {
-		let report = new ImageReport({
+		let report = new ImagingHeap({
 			minViewportWidth: argv.min,
 			maxViewportWidth: argv.max,
 			increment: argv.by,

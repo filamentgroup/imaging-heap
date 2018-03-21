@@ -1,8 +1,8 @@
 const puppeteer = require("puppeteer");
 const ImageMap = require("./ImageMap");
-const debug = require("debug")("imagereport");
+const debug = require("debug")("ImagingHeap");
 
-class ImageReport {
+class ImagingHeap {
 	constructor(options) {
 		this.options = Object.assign({}, this.defaultOptions, options || {});
 
@@ -198,4 +198,4 @@ class ImageReport {
 	}
 }
 
-module.exports = ImageReport;
+module.exports = ImagingHeap;

@@ -1,22 +1,26 @@
-# image-report
+# imaging-heap
+
+There’s beauty in the breakdown of bitmap image data. A command line tool to measure the efficiency of your responsive image markup across viewport sizes and device pixel ratios.
 
 ## Installation
 
 ```
-Not on NPM yet!
+npm install --global imaging-heap
 ```
 
 ## Usage
 
 ```
-node src/cmd.js https://filamentgroup.com/
-node src/cmd.js https://smashingmagazine.com/
-node src/cmd.js https://css-tricks.com/
+imagingheap https://filamentgroup.com/
+imagingheap https://smashingmagazine.com/
+imagingheap https://css-tricks.com/
 ```
 
-## TODO
+### Debug Output
 
-* Add more automated tests
+```
+DEBUG=ImagingHeap* imagingheap https://filamentgroup.com/
+```
 
 ## Sample output
 

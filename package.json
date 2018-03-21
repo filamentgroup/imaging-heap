@@ -1,8 +1,8 @@
 {
-  "name": "image-report",
+  "name": "imaging-heap",
   "version": "1.0.0",
   "description": "A command line tool to measure responsive image efficiency across viewport sizes and device pixel ratios.",
-  "main": "src/ImageReport.js",
+  "main": "src/ImagingHeap.js",
   "engines": {
     "node": ">=8.0.0"
   },
@@ -10,7 +10,7 @@
     "test": "ava"
   },
   "bin": {
-    "imagereport": "./src/cmd.js"
+    "imagingheap": "./src/cmd.js"
   },
   "keywords": [
     "responsive-images",
