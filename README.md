@@ -4,27 +4,39 @@ There’s beauty in the breakdown of bitmap image data. A command line tool to m
 
 ## Installation
 
-```
+```sh
 npm install --global imaging-heap
 ```
 
 ## Usage
 
-```
+```sh
 imagingheap https://filamentgroup.com/
-imagingheap https://smashingmagazine.com/
-imagingheap https://css-tricks.com/
+```
+
+```sh
+imagingheap http://example.com/ [options]
+
+Options:
+  --version        Show version number                                 [boolean]
+  --min            Minimum viewport width                         [default: 320]
+  --max            Maximum viewport width                        [default: 1280]
+  --by             Increment viewport by                           [default: 80]
+  --dpr            List of Device Pixel Ratios       [string] [default: "1,2,3"]
+  --minimagewidth  Ignore images smaller than image width           [default: 5]
+  --csv            Output CSV                         [boolean] [default: false]
+  --help           Show help                                           [boolean]
 ```
 
 ### Debug Output
 
-```
+```sh
 DEBUG=ImagingHeap* imagingheap https://filamentgroup.com/
 ```
 
 ## Sample output
 
-```
+```sh
 ╔══════════╤══════════╤═══════╤════════════╤════════╤════════════╤════════╤════════════╗
 ║          │ Image    │ @1x   │ @1x        │ @2x    │ @2x        │ @3x    │ @3x        ║
 ║          │ Width in │ Image │ Percentage │ Image  │ Percentage │ Image  │ Percentage ║
