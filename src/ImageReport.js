@@ -82,7 +82,8 @@ class ImageReport {
 			// });
 
 			let imagesStats = await this.getImagesStats(page);
-			for( let stats of imagesStats ) {
+			for( let statsJson of imagesStats ) {
+				let stats = JSON.parse(statsJson);
 				this.map[url].addImage(stats.id, dpr, stats);
 			}
 
@@ -91,29 +92,27 @@ class ImageReport {
 	}
 
 	async getImagesStats(page) {
-		return page.evaluate(async function() {
-			function findNaturalWidth(src, stats, resolve, reject) {
-				try {
-					var naturalImg = document.createElement("img");
-					naturalImg.src = src;
-					naturalImg.onload = function() {
-						resolve(Object.assign(stats, {
-							fileWidth: naturalImg.naturalWidth,
-							src: src,
-						}));
+		return page.evaluate(function() {
+			function findNaturalWidth(src, stats, resolve) {
+				var naturalImg = document.createElement("img");
+				naturalImg.src = src;
+				naturalImg.onload = function() {
+					resolve(JSON.stringify(Object.assign(stats, {
+						fileWidth: naturalImg.naturalWidth,
+						src: src,
+					})));
 
-						this.parentNode.removeChild(this);
-						console.log( "removed node for", src );
-					};
+					this.parentNode.removeChild(this);
+				};
 
-					naturalImg.onerror = function() {
-						reject(`Could not load ${src}`);
-					};
+				naturalImg.onerror = function() {
+					resolve(JSON.stringify(Object.assign(stats, {
+						fileWidth: undefined,
+						src: src,
+					})));
+				};
 
-					document.body.appendChild(naturalImg);
-				} catch(e) {
-					reject(`Could not create dimensions image for ${src}`);
-				}
+				document.body.appendChild(naturalImg);
 			}
 
 			let viewportWidth = document.documentElement.clientWidth;
@@ -122,7 +121,7 @@ class ImageReport {
 			let imgNodes = document.querySelectorAll("img");
 			let imgArray = Array.from(imgNodes);
 
-			return await Promise.all(
+			let promises = Promise.all(
 				imgArray.filter(function(img) {
 					let src = img.currentSrc;
 					if( !src ) {
@@ -139,10 +138,10 @@ class ImageReport {
 					let id = img.getAttribute(key);
 					if(!id) {
 						id = img.getAttribute("src");
-						console.log("Creating new img id", id);
+						// console.log("Creating new img id", id);
 						img.setAttribute(key, id);
 					} else {
-						console.log("Re-use existing img id", id);
+						// console.log("Re-use existing img id", id);
 					}
 
 					let picture = img.closest("picture");
@@ -150,34 +149,34 @@ class ImageReport {
 					let html = (picture || img).outerHTML.replace(/\t/g, "");
 					img.setAttribute(key, id);
 
-					console.log(`width: ${img.clientWidth}`);
-
-					// this is wrong in chrome when used with srcset
-					// console.log(`natural width: ${img.naturalWidth}`);
-					console.log(`currentSrc: ${img.currentSrc}`);
 
 					let stats = {
 						id: id,
-						width: img.clientWidth,
 						viewportWidth: viewportWidth,
 						html: html
 					};
 
 					return new Promise(function(resolve, reject) {
-						if( !img.currentSrc ) {
-							console.log( "No img.currentSrc, waiting to load image to find dimensions." );
-							img.onload = function() {
-								img.onload = null;
+						function done() {
+							stats.width = img.clientWidth;
+							console.log(`currentSrc: ${img.currentSrc}`);
+							console.log(`width: ${img.clientWidth}`);
 
-								findNaturalWidth(img.currentSrc, stats, resolve, reject);
-							};
+							findNaturalWidth(img.currentSrc, stats, resolve);
+						}
+
+						if( !img.currentSrc ) {
+							img.addEventListener("load", done, {
+								once: true
+							});
 						} else {
-							console.log( "currentSrc exists, finding dimensions." );
-							findNaturalWidth(img.currentSrc, stats, resolve, reject);
+							done();
 						}
 					});
 				})
 			);
+
+			return promises;
 		});
 	}
 	

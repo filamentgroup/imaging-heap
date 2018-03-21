@@ -40,7 +40,7 @@
   "dependencies": {
     "chalk": "^2.3.2",
     "debug": "^3.1.0",
-    "puppeteer": "^1.1.1",
+    "puppeteer": "^1.2.0",
     "table": "^4.0.3",
     "yargs": "^11.0.0"
   }
