@@ -126,7 +126,7 @@ class ImageMap {
 					}
 
 					let efficiencyOutput;
-					if( widthRatio < 1 || percentage < 85 ) {
+					if( widthRatio < 1 || percentage < 75 ) {
 						efficiencyOutput = chalk.red(str);
 					} else if( percentage < 92 || percentage > 150 ) {
 						efficiencyOutput = chalk.yellow(str);
@@ -196,11 +196,7 @@ class ImageMap {
 					return index === 0 || index === 3 || index === size;
 				}
 			}) +
-			chalk.underline("Legend") +
-			": " + 
-			chalk.red("Too blurry—need a bigger image!") +
-			" " +
-			chalk.yellow("Close but room for improvement!") + "\n");
+			`${chalk.underline("Legend")}:  @1x ${chalk.red("<100%")} ${chalk.yellow(">150%")}    Above @1x ${chalk.red("<75%")} ${chalk.yellow("75%–92%")}\n`);
 		}
 
 		let size = this.getNumberOfImages();
