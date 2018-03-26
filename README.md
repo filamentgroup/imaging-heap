@@ -54,9 +54,13 @@ DEBUG=ImagingHeap* imagingheap https://filamentgroup.com/
 ╚══════════╧══════════╧═══════╧════════════╧════════╧════════════╧════════╧════════════╝
 ```
 
-## Important Links
+## Related Projects
 
 * Hugely inspired by the [NCC Image Checker Chrome Extension](https://github.com/nccgroup/image-checker) (which is a great visual tool). The main difference here is that imaging-heap will collate data across viewport sizes and device pixel ratios.
+* [RespImageLint](https://ausi.github.io/respimagelint/) a Linter Bookmarklet for Responsive Images
+
+## Important Links
+
 * _A big big thank you_ for pre-release feedback from noted responsive images expert [Eric Portis](https://ericportis.com/) ([@eeeps](https://github.com/eeeps/)).
 * Idea originally documented at [@zachleat/idea-book/3](https://github.com/zachleat/idea-book/issues/3)
 * _“There’s beauty in the breakdown of bitmap image data.”_—[@jefflembeck](https://github.com/jefflembeck)
