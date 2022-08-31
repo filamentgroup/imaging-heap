@@ -1,3 +1,5 @@
+:warning: This project is archived and the repository is no longer maintained.
+
 # imaging-heap
 
 There’s beauty in the breakdown of bitmap image data. A command line tool to measure the efficiency of your responsive image markup across viewport sizes and device pixel ratios.
